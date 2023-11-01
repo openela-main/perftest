@@ -1,0 +1,298 @@
+.\" Copyright (c) 2014, Jan Chaloupka <jchaloup@redhat.com>
+.\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.TH "IB_ATOMIC_BW" 1 2014 "Open Fabrics Enterprise Distribution"
+.\" IB_ATOMIC_BW
+.SH NAME
+ib_atomic_bw, ib_atomic_lat, ib_read_bw, ib_read_lat, ib_send_bw,
+ib_send_lat, ib_write_bw, ib_write_lat
+\- Collection of tests written over uverbs intended for use as a
+performance micro-benchmark
+.SH SYNOPSIS
+.sp
+.B ib_atomic_bw [<host>] [options]
+.sp
+.B ib_atomic_lat [<host>] [options]
+.sp
+.B ib_read_bw [<host>] [options] 
+.sp
+.B ib_read_lat [<host>] [options]
+.sp
+.B ib_write_bw [<host>] [options]
+.sp
+.B ib_write_lat [<host>] [options]
+.SH DESCRIPTION
+This is a collection of tests written over uverbs intended for use as a
+performance micro-benchmark. As an example, the tests can be used for
+HW or SW tuning and/or functional testing.
+
+The collection conatains a set of BW and latency benchmark such as :
+.sp
+* Read   - ib_read_bw and ib_read_lat.
+.sp
+* Write  - ib_write_bw and ib_wriet_lat.
+.sp
+* Send   - ib_send_bw and ib_send_lat.
+.sp
+* Atomic - ib_atomic_bw and ib_atomic_lat
+.sp
+* Raw Etherent (when working with MOFED2) - raw_ethernet_bw, raw_ethernet_lat
+
+The benchmark used the CPU cycle counter to get time stamps without context
+switch.  Some CPU architectures (e.g., Intel's 80486 or older PPC) do NOT
+have such capability.
+
+The latency benchmarks measures round-trip time but reports half of that as
+one-way latency.
+This means that it may not be sufficiently accurate for asymmetrical
+configurations.
+
+On Bw benchmarks, we calculate the BW on send side only, as he calculates
+the Bw after collecting completion from the receive side.
+In case we use the bidirectional flag , BW is calculated on both sides.
+in ib_send_bw, server side also calculate the received throughput.
+
+Min/Median/Max result is reported in latency tests.
+The median (vs average) is less sensitive to extreme scores.
+Typically, the "Max" value is the first value measured.
+
+Larger samples help marginally only. The default (1000) is pretty good.
+Note that an array of cycles_t (typically unsigned long) is allocated
+once to collect samples and again to store the difference between them.
+Really big sample sizes (e.g., 1 million) might expose other problems
+with the program. In this case you can use -N flag (No Peak) to instruct
+the test sample only 2 times (begining and end).
+
+All throughput tests now have duration feature as well (-D <seconds to run>)
+to instruct the test to run for <seconds to run>.
+Another feature added is --run_infinitely, which instruct the test to run
+all te time and print throughput every 5 seconds.
+
+The "-H" option (latency) will dump the histogram for additional statistical
+analysis.
+See xgraph, ygraph, r-base (http://www.r-project.org/), pspp, or other
+statistical math programs.
+
+
+Architectures tested: i686, x86_64, ia64
+.SH OPTIONS
+The SAME OPTIONS must be passed to both server and client.
+
+If
+.I <host>
+is not presented, command starts a server and waits for connection.
+If it is, command connects to server at
+.I <host>.
+.sp
+.B Common Options:
+.RS 4
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display this help message screen.
+.TP
+\fB\-p\fR, \fB\-\-port\fR=\fI<port>\fR
+Listen on/connect to port <port> (default: 18515) when exchaning data.
+.TP
+\fB\-R\fR, \fB\-\-rdma_cm\fR
+Connect QPs with rdma_cm and run test on those QPs.
+.TP
+\fB\-z\fR, \fB\-\-com_rdma_cm\fR
+Communicate with rdma_cm module to exchange data \- use regular QPs.
+.TP
+\fB\-m\fR, \fB\-\-mtu\fR=\fI<mtu>\fR
+ QP Mtu size (default: active_mtu from ibv_devinfo).
+.TP
+\fB\-c\fR, \fB\-\-connection\fR=\fI<RC/UC/UD>\fR
+Connection type RC/UC/UD (default RC)
+.TP
+\fB\-d\fR, \fB\-\-ib\-dev\fR=\fI<dev>\fR
+Use IB device <dev> (default: first device found).
+.TP
+\fB\-i\fR, \fB\-\-ib\-port\fR=\fI<port>\fR
+Use port <port> of IB device (default: 1).
+.TP
+\fB\-s\fR, \fB\-\-size\fR=\fI<size>\fR
+Size of message to exchange (default: 1).
+.TP
+\fB\-a\fR, \fB\-\-all\fR
+Run sizes from 2 till 2^23.
+.TP
+\fB\-n\fR, \fB\-\-iters\fR=\fI<iters>\fR
+Number of exchanges (at least 100, default: 1000).
+.TP
+\fB\-x\fR, \fB\-\-gid\-index\fR=\fI<index>\fR
+Test uses GID with GID index taken from command
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Display version number.
+.TP
+\fB\-e\fR, \fB\-\-events\fR
+Sleep on CQ events (default poll).
+.TP
+\fB\-F\fR, \fB\-\-CPU\-freq\fR
+Do not fail even if cpufreq_ondemand module.
+.TP
+\fB\-I\fR, \fB\-\-inline_size\fR=\fI<size>\fR
+Max size of message to be sent in inline mode.
+.TP
+\fB\-u\fR, \fB\-\-qp\-timeout\fR=\fI<timeout>\fR
+QP timeout, timeout value is 4 usec*2 ^timeout (default: 14).
+.TP
+\fB\-S\fR, \fB\-\-sl\fR=\fI<sl>\fR
+SL \- Service Level (default 0)
+.TP
+\fB\-r\fR, \fB\-\-rx\-depth\fR=\fI<dep>\fR
+Make rx queue bigger than tx (default 600).
+.RE
+.sp
+.B Latenct tests options:
+.RS 4
+.TP
+\fB\-C\fR, \fB\-\-report\-cycles\fR
+Report times in cpu cycle units.
+.TP
+\fB\-H\fR, \fB\-\-report\-histogram\fR
+Print out all results (Default: summary only).
+.TP
+\fB\-U\fR, \fB\-\-report\-unsorted\fR
+Print out unsorted results (default sorted).
+.RE
+.sp
+.B BW tests options:
+.RS 4
+.TP
+\fB\-b\fR, \fB\-\-bidirectional\fR
+Measure bidirectional bandwidth (default uni).
+.TP
+\fB\-N\fR, \fB\-\-no\fR
+peak\-bw              Cancel peak\-bw calculation (default with peak\-bw)
+.TP
+\fB\-Q\fR, \fB\-\-cq\-mod\fR
+Generate Cqe only after <cq\-mod> completion
+.TP
+\fB\-t\fR, \fB\-\-tx\-depth=<dep>\fR
+Size of tx queue (default: 128).
+.TP
+\fB\-O\fR, \fB\-\-dualport\fR
+Run test in dual\-port mode (2 QPs). both ports must be active (default OFF).
+.TP
+\fB\-D\fR, \fB\-\-duration=<sec>\fR
+Run test for <sec> period of seconds.
+.TP
+\fB\-f\fR, \fB\-\-margin=<sec>\fR
+When in Duration, measure results within margins (default: 2)
+.TP
+\fB\-l\fR, \fB\-\-post_list=<list_size>\fR
+Post list of WQEs of <list size> size (instead of single post).
+.TP
+\fB\-q\fR, \fB\-\-qp=<num_of_qps>\fR
+Num of QPs running in the process (default: 1).
+.TP
+\fB\-\-run_infinitely \fR
+Run test forever\fR, \fBprint results every 5 seconds.
+.RE
+.sp
+.B SEND tests options:
+.RS 4
+.TP
+\fB\-r\fR, \fB\-\-rx\-depth=<dep>\fR
+Size of RX queue (default: 512 in BW test).
+.TP
+\fB\-g\fR, \fB\-\-mcg=<num_of_qps>\fR
+Send messages to multicast group with <num_of_qps> qps attached to it.
+.TP
+\fB\-M\fR, \fB\-\-MGID=<multicast_gid>\fR
+In multicast, uses <multicast_gid> as the group MGID.
+.RE
+.sp
+.B Raw Ethernet BW test options:
+.RS 4
+.TP
+\fB\-A\fR, \fB\-\-atomic_type=<type>\fR
+type of atomic operation from {CMP_AND_SWAP,FETCH_AND_ADD}.
+.TP
+\fB\-o\fR, \fB\-\-outs=<num>\fR
+Number of outstanding read/atomic requests \- also on READ tests.
+.TP
+\fB\-B\fR, \fB\-\-source_mac\fR
+source MAC address by this format XX:XX:XX:XX:XX:XX (default take the MAC address form GID).
+.TP
+\fB\-E\fR, \fB\-\-dest_mac\fR
+destination MAC address by this format XX:XX:XX:XX:XX:XX **MUST** be entered.
+.TP
+\fB\-J\fR, \fB\-\-server_ip\fR
+server ip address by this format X.X.X.X (using to send packets with IP header).
+.TP
+\fB\-j\fR, \fB\-\-client_ip\fR
+client ip address by this format X.X.X.X (using to send packets with IP header).
+.TP
+\fB\-K\fR, \fB\-\-server_port\fR
+server udp port number (using to send packets with UPD header).
+.TP
+\fB\-k\fR, \fB\-\-client_port\fR
+client udp port number (using to send packets with UDP header).
+.TP
+\fB\-Z\fR, \fB\-\-server\fR
+choose server side for the current machine (\-\-server/\-\-client must be selected ).
+.TP
+\fB\-P\fR, \fB\-\-client\fR
+choose client side for the current machine (\-\-server/\-\-client must be selected).
+.RE
+.SH ENVIRONMENT
+.B Prerequisites:
+.RS
+kernel 2.6
+.RE
+.RS
+(kernel module) matches libibverbs
+.RE
+.RS
+(kernel module) matches librdmacm
+.RE
+.RS
+(kernel module) matches libibumad
+.RE
+.RS
+(kernel module) matches libmath (lm).
+.RE
+.SH NOTES
+You need to be running a Subnet Manager on the switch or on one of the nodes in your fabric, in case you are in IB fabric.
+.SH BUGS
+1. Multicast feauture in ib_send_lat and in ib_send_bw still have many problems!
+Will increase the support and bug fixes in this Q, but now the tests may stuck
+and could produce undefine behaviours.
+.sp
+2. Bidirectional feature in ib_send_bw test, when running in UD or UC mode.
+The algorithm we use for the bidirectional measurement is designed for RC connection type.
+When running in UC or UD connection types, there is a small probablity the test will be stuck.
+.sp
+3. RDMA_CM feature in read tests still doesn't work.
+.sp
+4. Dual-port support currently works only with ib_write_bw.
+.sp
+5. Compabilty issues may occur between different versions of perftest.
+Please make sure you work with the same version on both sides to ensure
+consistency of the test.
+.SH AUTHORS
+Please post results/observations to the openib-general mailing list.
+See "Contact Us" at http://openib.org/mailman/listinfo/openib-general and
+http://www.openib.org.
