@@ -3,13 +3,14 @@ Summary:        IB Performance Tests
 # Upstream uses a dash in the version. Not valid in the Version field, so we use a dot instead.
 # Issue "Please avoid dashes in version":
 #   https://github.com/linux-rdma/perftest/issues/18
-%global upstream_ver 4.5-0.20
+%global upstream_ver 23.04.0-0.23
 Version:        %{lua: print((string.gsub(rpm.expand("%{upstream_ver}"),"-",".")))}
-Release:        4%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 or BSD
-Source:         https://github.com/linux-rdma/perftest/releases/download/v4.5-0.20/perftest-4.5-0.20.gac7cca5.tar.gz
+Source:         https://github.com/linux-rdma/perftest/releases/download/23.04.0-0.23/perftest-23.04.0-0.23.g63e250f.tar.gz
 Source1:	ib_atomic_bw.1
 Url:            https://github.com/linux-rdma/perftest
+Patch01: 0001-perftest-Add-Intel-device-names-and-inline-data-size.patch
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -31,6 +32,7 @@ RDMA networks.
 
 %setup -q -n %{name}-%{tarball_ver}
 find src -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
+%patch01 -p1
 
 %build
 %configure
@@ -55,6 +57,15 @@ popd
 %_bindir/*
 
 %changelog
+* Tue Jul 18 2023 Kamal Heib <kheib@redhat.com> - 23.04.0.0.23-2
+- Add missing Intel Parameters
+- Resolves: rhbz#2211464
+
+* Mon Jun 05 2023 Kamal Heib <kheib@redhat.com> - 23.04.0.0.23-1
+- Update to upstream release 23.04.0.0.23
+- Add gating tests
+- Resolves: rhbz#2212517
+
 * Wed Feb 08 2023 Michal Schmidt <mschmidt@redhat.com> - 4.5.0.20-4
 - Rebase to upstream version 4.5-0.20
 - Resolves: rhbz#2168109
