@@ -3,14 +3,13 @@ Summary:        IB Performance Tests
 # Upstream uses a dash in the version. Not valid in the Version field, so we use a dot instead.
 # Issue "Please avoid dashes in version":
 #   https://github.com/linux-rdma/perftest/issues/18
-%global upstream_ver 23.04.0-0.23
+%global upstream_ver 23.07.0-0.27
 Version:        %{lua: print((string.gsub(rpm.expand("%{upstream_ver}"),"-",".")))}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2 or BSD
-Source:         https://github.com/linux-rdma/perftest/releases/download/23.04.0-0.23/perftest-23.04.0-0.23.g63e250f.tar.gz
+Source:         https://github.com/linux-rdma/perftest/releases/download/23.07.0-0.27/perftest-23.07.0-0.27.g117a291.tar.gz
 Source1:	ib_atomic_bw.1
 Url:            https://github.com/linux-rdma/perftest
-Patch01: 0001-perftest-Add-Intel-device-names-and-inline-data-size.patch
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -32,7 +31,6 @@ RDMA networks.
 
 %setup -q -n %{name}-%{tarball_ver}
 find src -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
-%patch01 -p1
 
 %build
 %configure
@@ -57,6 +55,10 @@ popd
 %_bindir/*
 
 %changelog
+* Thu Oct 26 2023 Kamal Heib <kheib@redhat.com> - 23.07.0.0.27-1
+- Update to upstream release 23.07.0.0.27
+- Resolves: RHEL-1270
+
 * Tue Jul 18 2023 Kamal Heib <kheib@redhat.com> - 23.04.0.0.23-2
 - Add missing Intel Parameters
 - Resolves: rhbz#2211464
