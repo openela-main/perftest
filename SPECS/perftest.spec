@@ -3,11 +3,11 @@ Summary:        IB Performance Tests
 # Upstream uses a dash in the version. Not valid in the Version field, so we use a dot instead.
 # Issue "Please avoid dashes in version":
 #   https://github.com/linux-rdma/perftest/issues/18
-%global upstream_ver 24.07.0-0.44
+%global upstream_ver 25.04.0-0.84
 Version:        %{lua: print((string.gsub(rpm.expand("%{upstream_ver}"),"-",".")))}
 Release:        1%{?dist}
 License:        GPLv2 or BSD
-Source:         https://github.com/linux-rdma/perftest/releases/download/24.07.0-0.44/perftest-24.07.0-0.44.g57725f2.tar.gz
+Source:         https://github.com/linux-rdma/perftest/releases/download/25.04.0-0.84/perftest-25.04.0-0.84.g97da83e.tar.gz
 Url:            https://github.com/linux-rdma/perftest
 
 BuildRequires:  make
@@ -47,6 +47,10 @@ done
 %_bindir/*
 
 %changelog
+* Thu Jul 03 2025 Kamal Heib <kheib@redhat.com> - 25.04.0.0.84-1
+- Update to upstream release 25.04.0.0.84
+- Resolves: RHEL-99801
+
 * Wed Nov 06 2024 Kamal Heib <kheib@redhat.com> - 24.07.0.0.44-1
 - Update to upstream release 24.07.0.0.44
 - Resolves: RHEL-66185
