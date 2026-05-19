@@ -1,0 +1,31 @@
+From 8b12d44601594f001b54d4a820ad2f4598ae4b3d Mon Sep 17 00:00:00 2001
+From: Shmuel Shaul <sshaul@nvidia.com>
+Date: Sun, 4 Jan 2026 13:45:41 +0200
+Subject: [PATCH] Perftest: Fix RDMA CM DMAH bug
+
+When running with RDMA CM the tph related variables
+are reset to 0. this lead to wrong flow of creating DMAH without
+requesting it.
+
+Signed-off-by: Shmuel Shaul <sshaul@nvidia.com>
+---
+ src/perftest_communication.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/perftest_communication.c b/src/perftest_communication.c
+index 65b5c464cf03..5a54186e3e90 100755
+--- a/src/perftest_communication.c
++++ b/src/perftest_communication.c
+@@ -1348,6 +1348,9 @@ int create_comm_struct(struct perftest_comm *comm,
+ 	comm->rdma_params->use_old_post_send	= user_param->use_old_post_send;
+ 	comm->rdma_params->source_ip		= user_param->source_ip;
+ 	comm->rdma_params->has_source_ip	= user_param->has_source_ip;
++	comm->rdma_params->tph_mem_type	= user_param->tph_mem_type;
++	comm->rdma_params->processing_hints	= user_param->processing_hints;
++	comm->rdma_params->cpu_id		= user_param->cpu_id;
+ 	comm->rdma_params->memory_type		= MEMORY_HOST;
+ 	comm->rdma_params->memory_create	= host_memory_create;
+ 
+-- 
+2.52.0
+

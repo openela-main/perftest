@@ -3,12 +3,13 @@ Summary:        IB Performance Tests
 # Upstream uses a dash in the version. Not valid in the Version field, so we use a dot instead.
 # Issue "Please avoid dashes in version":
 #   https://github.com/linux-rdma/perftest/issues/18
-%global upstream_ver 25.04.0-0.84
+%global upstream_ver 25.10.0-0.128
 Version:        %{lua: print((string.gsub(rpm.expand("%{upstream_ver}"),"-",".")))}
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 or BSD
-Source:         https://github.com/linux-rdma/perftest/releases/download/25.04.0-0.84/perftest-25.04.0-0.84.g97da83e.tar.gz
+Source:		https://github.com/linux-rdma/perftest/releases/download/25.10.0-0.128/perftest-25.10.0-0.128.gd01b183.tar.gz
 Url:            https://github.com/linux-rdma/perftest
+Patch01:	Perftest-Fix-RDMA-CM-DMAH-bug.patch
 
 BuildRequires:  make
 BuildRequires:  gcc
@@ -16,6 +17,7 @@ BuildRequires:  libibverbs-devel >= 1.2.0
 BuildRequires:  librdmacm-devel >= 1.0.21
 BuildRequires:  libibumad-devel >= 1.3.10.2
 BuildRequires:  pciutils-devel
+Requires:       rdma-core
 Obsoletes:      openib-perftest < 1.3
 ExcludeArch:    s390 %{arm}
 
@@ -31,6 +33,7 @@ RDMA networks.
 
 %setup -q -n %{name}-%{tarball_ver}
 find src -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
+%patch -P 1 -p1
 
 %build
 %configure
@@ -47,6 +50,18 @@ done
 %_bindir/*
 
 %changelog
+* Wed Jan 28 2026 Kamal Heib <kheib@redhat.com> - 25.10.0.0.128-3
+- Fix RDMA CM DMAH bug
+- Resolves: RHEL-134210
+
+* Fri Jan 23 2026 Kamal Heib <kheib@redhat.com> - 25.10.0.0.128-2
+- Rebuilt for RHEL-9.8
+- Resolves: RHEL-134210
+
+* Wed Dec 10 2025 Kamal Heib <kheib@redhat.com> - 25.10.0.0.128-1
+- Update to upstream release 25.10.0.0.128
+- Resolves: RHEL-134210
+
 * Thu Jul 03 2025 Kamal Heib <kheib@redhat.com> - 25.04.0.0.84-1
 - Update to upstream release 25.04.0.0.84
 - Resolves: RHEL-99801
